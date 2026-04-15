@@ -11,6 +11,10 @@ public class DOMNode
     // teks
     // contoh : "<body>Hello</body>, Hello berarti Text"
     public string Text { get; set; }
+    //untuk Id di css selector
+    public string Id{get; set;}
+    //untuk class di css selector
+    public List<string> Class {get; set; }
     public List<DOMNode> Children { get; set; }
     public DOMNode Parent { get; set; }
     //constructor
