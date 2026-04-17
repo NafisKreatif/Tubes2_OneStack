@@ -1,0 +1,15 @@
+@model JsonModel
+@{
+    ViewData["Title"] = "Result";
+}
+
+<div class="text-center">
+    <h1 class="display-5">@ViewData["Title"]</h1>
+    <p>@Model.json</p>
+    <canvas width="800" height="600" class="border-2"></canvas>
+</div>
+
+<script>
+    const htmlTree = JSON.parse("@Html.Raw(Model.json)"); 
+    console.log(htmlTree);
+</script>
