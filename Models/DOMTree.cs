@@ -3,28 +3,24 @@ using System;
 using System.Collections.Generic;
 
 //2 Jenis DOMNode: Tag atau Text
-public class DOMNode 
+public class DOMNode(string tag = "", string text = "")
 {
-    
+    private static int IdCounter = 1;
+    public int NodeID = IdCounter++;
+
     // tag (<body>, </div>, </span>, dll) 
-    public string Tag { get; set; }
+    public string Tag { get; set; } = tag;
     // teks
     // contoh : "<body>Hello</body>, Hello berarti Text"
-    public string Text { get; set; }
+    public string Text { get; set; } = text;
     //untuk Id di css selector
-    public string Id{get; set;}
+    public string Id { get; set; } = "";
     //untuk class di css selector
-    public List<string> Class {get; set; }
-    public List<DOMNode> Children { get; set; }
-    public DOMNode Parent { get; set; }
-    //constructor
-    public DOMNode(string tag = "", string text = "")
-    {
-        Tag = tag;
-        Text = text;
-        Children = new List<DOMNode>();
-    }
-    
+    public List<string> Class { get; set; } = new List<string>();
+    public Dictionary<string, string> Attribute { get; set; } = new Dictionary<string, string>();
+    public List<DOMNode> Children { get; set; } = new List<DOMNode>();
+    public DOMNode? Parent { get; set; }
+
     public bool IsTextNode()
     {
         return string.IsNullOrEmpty(Tag) && !string.IsNullOrEmpty(Text);
