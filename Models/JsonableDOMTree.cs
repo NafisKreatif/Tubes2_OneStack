@@ -2,9 +2,16 @@ using DOMTreeTraversal.Models;
 
 class JsonableDomTree
 {
-    public List<JsonableDomNode> Nodes;
+    public int RootId { get; set; }
+    public Dictionary<int, JsonableDomNode> Nodes { get; set; }
+    public JsonableDomTree()
+    {
+        RootId = 0;
+        Nodes = [];
+    }
     public JsonableDomTree(DOMTree tree)
     {
+        RootId = tree.Root.NodeId;
         Nodes = [];
         Queue<DOMNode> bfs = new();
         bfs.Enqueue(tree.Root);
@@ -13,7 +20,7 @@ class JsonableDomTree
             DOMNode node = bfs.Dequeue();
             JsonableDomNode jsonable = new()
             {
-                Index = node.NodeID,
+                Index = node.NodeId,
                 Tag = node.Tag,
                 Text = node.Text,
                 Id = node.Id,
@@ -23,15 +30,15 @@ class JsonableDomTree
             };
             if (node.Parent != null)
             {
-                jsonable.Parent = node.Parent.NodeID;
-                Nodes[jsonable.Parent].Children.Add(node.NodeID);
+                jsonable.Parent = node.Parent.NodeId;
+                Nodes[jsonable.Parent].Children.Add(node.NodeId);
             }
             else
             {
                 jsonable.Parent = -1;
             }
 
-            Nodes.Add(jsonable);
+            Nodes[jsonable.Index] = jsonable;
             foreach (var child in node.Children)
             {
                 bfs.Enqueue(child);

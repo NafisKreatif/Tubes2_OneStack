@@ -38,13 +38,13 @@ public class HomeController : Controller
                 break;
         }
 
-        JsonableDomTree test = new JsonableDomTree(DOMTreeStub.GetTestCase1());
-        for (int i = 0; i < test.Nodes.Count; i++)
+        JsonableDomTree test = new(DOMTreeStub.GetTestCase1());
+        Console.WriteLine(JsonSerializer.Serialize(test));
+        foreach (KeyValuePair<int, JsonableDomNode> item in test.Nodes)
         {
-            Console.WriteLine(i + " : " + test.Nodes[i]);
-        Console.WriteLine(JsonSerializer.Serialize(test.Nodes));
+            Console.WriteLine(item.Key + ": " + item.Value.Tag);
         }
-        return View(new JsonModel(JsonSerializer.Serialize(test.Nodes)));
+        return View(new JsonModel(JsonSerializer.Serialize(test)));
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

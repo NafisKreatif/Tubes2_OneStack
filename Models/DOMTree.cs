@@ -1,4 +1,5 @@
 namespace DOMTreeTraversal.Models;
+
 using System;
 using System.Collections.Generic;
 
@@ -6,7 +7,7 @@ using System.Collections.Generic;
 public class DOMNode(string tag = "", string text = "")
 {
     private static int IdCounter = 1;
-    public int NodeID = IdCounter++;
+    public int NodeId = IdCounter++;
 
     // tag (<body>, </div>, </span>, dll) 
     public string Tag { get; set; } = tag;

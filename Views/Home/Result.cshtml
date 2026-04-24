@@ -5,11 +5,56 @@
 
 <div class="text-center">
     <h1 class="display-5">@ViewData["Title"]</h1>
-    <p>@Model.json</p>
+    <p id="json">@Model.json</p>
+    <div id="result-tree" class="overflow-x-auto w-100 border border-2">
+
+    </div>
     <canvas width="800" height="600" class="border-2"></canvas>
 </div>
 
 <script>
-    const htmlTree = JSON.parse("@Html.Raw(Model.json)"); 
+    const htmlTree = JSON.parse('@Html.Raw(Model.json)');
+    document.getElementById("json").textContent = JSON.stringify(htmlTree, null, 2);
     console.log(htmlTree);
+    function build(element = document.createElement("div"), htmlTree) {
+        let currentNode = htmlTree.Nodes[htmlTree.RootId];
+        let nodeStack = [currentNode];
+        let childContainerMap = new Map();
+        while (nodeStack.length > 0) {
+            // Get node from stack
+            currentNode = nodeStack.pop()
+
+            // Make new element
+            let newElement = document.createElement("div");
+            newElement.classList.add("node", "w-100");
+
+            // Append to parent
+            if (currentNode.Parent == -1) {
+                element.appendChild(newElement);
+            }
+            else {
+                childContainerMap[currentNode.Parent].appendChild(newElement);
+            }
+
+            // Create description
+            let text = document.createElement("p");
+            text.classList.add("w-100");
+            text.textContent = currentNode.Tag;
+            newElement.appendChild(text);
+
+            // Create child container
+            let childContainer = document.createElement("div");
+            newElement.appendChild(childContainer);
+            childContainer.classList.add("w-100", "d-flex");
+            childContainerMap[currentNode.Index] = childContainer;
+
+            // Next Elements
+            for (let i = 0; i < currentNode.Children.length; i++) {
+                let index = currentNode.Children[i];
+                let nextNode = htmlTree.Nodes[index];
+                nodeStack.push(nextNode);
+            }
+        }
+    }
+    build(document.getElementById("result-tree"), htmlTree);
 </script>
