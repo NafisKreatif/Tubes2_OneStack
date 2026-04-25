@@ -21,25 +21,36 @@ public class HomeController : Controller
     }
 
     [HttpPost]
-    public IActionResult DomTreeResult([Bind("HtmlLink", "HtmlText", "InputType")] HtmlInputModel model, IFormFile htmlFile)
+    public async Task<IActionResult> DomTreeResult([Bind("HtmlLink", "HtmlText", "InputType")] HtmlInputModel model, IFormFile htmlFile)
     {
-        string html = "";
-        switch (model.InputType)
+        DOMTree domTree = new();
+        try
         {
-            case "link":
-                html = model.HtmlLink ?? "";
-                break;
-            case "file":
-                if (htmlFile != null && htmlFile.Length > 0) html = htmlFile.FileName ?? "";
-                break;
-            case "text":
-                html = model.HtmlText ?? "";
-                break;
-            default:
-                break;
+            switch (model.InputType)
+            {
+                case "link":
+                    domTree = await HTMLParser.ParseFromUrl(model.HtmlLink ?? "");
+                    break;
+                case "file":
+                    if (htmlFile != null && htmlFile.Length > 0)
+                    {
+                        using var reader = new StreamReader(htmlFile.OpenReadStream());
+                        string htmlContent = await reader.ReadToEndAsync();
+                        domTree = HTMLParser.ParseFromString(htmlContent);
+                    }
+                    break;
+                case "text":
+                    domTree = HTMLParser.ParseFromString(model.HtmlText ?? "");
+                    break;
+            }
+        }
+        catch (Exception e)
+        {
+            domTree = new();
+            Console.WriteLine(e.ToString());
         }
 
-        return View(new DomTreeViewModel(TestCase1.GetDomTree()));
+        return View(new DomTreeViewModel(domTree));
     }
 
     [HttpPost]

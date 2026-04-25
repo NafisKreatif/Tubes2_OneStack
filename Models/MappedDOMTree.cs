@@ -26,10 +26,10 @@ class MappedDomTree
             {
                 Index = node.NodeId,
                 Tag = node.Tag,
-                Text = node.Text,
+                Text = "",
                 Id = node.Id,
                 Class = [.. node.Class],
-                Attribute = node.Attribute,
+                Attribute = [],
                 Children = []
             };
             if (node.Parent != null)
@@ -42,7 +42,7 @@ class MappedDomTree
             else
             {
                 jsonable.Parent = -1;
-                level[node] = 1;
+                level[node] = 0;
                 MaxLevel = Math.Max(MaxLevel, level[node]);
             }
 

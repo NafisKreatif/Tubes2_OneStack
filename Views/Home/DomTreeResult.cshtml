@@ -18,7 +18,7 @@
             <button type="submit"
                     class="my-2 py-1 px-3 bg-primary border-3 border-success-subtle rounded-3 text-white">Search</button>
         </div>
-        <input type="text" id="domTreeJson" name="domTreeJson" value='@Html.Raw(Model.DomTreeJson)' hidden />
+        <textarea type="text" id="domTreeJson" name="domTreeJson" hidden>@Html.Raw(Model.DomTreeJson)</textarea>
     </form>
     <h4 id="maxLevel">Kedalaman Maksimal: </h4>
     <div id="result-tree" class="overflow-x-scroll border border-2">
@@ -28,7 +28,7 @@
 </div>
 
 <script>
-    const htmlTree = JSON.parse('@Html.Raw(Model.DomTreeJson)');
+    const htmlTree = JSON.parse(`@Html.Raw(Model.DomTreeJson)`);
     document.getElementById("maxLevel").textContent = "Kedalaman Maksimal: " + htmlTree.MaxLevel
     // document.getElementById("json").textContent = JSON.stringify(htmlTree, null, 2);
     // console.log(htmlTree);
@@ -101,7 +101,7 @@
 
                 // Create info container
                 let infoContainer = document.createElement("div");
-                infoContainer.classList.add("w-100");
+                infoContainer.classList.add("w-100", "px-2");
                 newElement.appendChild(infoContainer);
 
                 let infos = document.createElement("div");
