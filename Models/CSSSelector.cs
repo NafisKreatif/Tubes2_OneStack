@@ -14,37 +14,38 @@ public enum TraversalMethod
 
 public static class CSSSelector
 {
-    public static (List<DOMNode>, List<DOMNode>) QuerySelectorAll(DOMTree tree, string selector, TraversalMethod method = TraversalMethod.DFS)
+    public static (List<DOMNode>, List<DOMNode>) QuerySelector(DOMTree tree, string selector, int maxSelected, TraversalMethod method = TraversalMethod.DFS)
     {
-        return QuerySelectorAll(tree.Root, selector, method);
+        return QuerySelector(tree.Root, selector, maxSelected, method);
     }
-    public static (List<DOMNode>, List<DOMNode>) QuerySelectorAll(DOMNode root, string selector, TraversalMethod method = TraversalMethod.DFS)
+    public static (List<DOMNode>, List<DOMNode>) QuerySelector(DOMNode root, string selector, int maxSelected, TraversalMethod method = TraversalMethod.DFS)
     {
-        // Empty Query
         if (string.IsNullOrWhiteSpace(selector)) return (new List<DOMNode>(), new List<DOMNode>()); 
 
         var tokens = TokenizeSelector(selector);
-        // no valid Query Tokenzzz
         if (tokens.Count == 0) return (new List<DOMNode>(), new List<DOMNode>());
 
-        var allNodes = GetAllNodes(root, method);
-        // yang memenuhi Query Token pertama dari urutan traversal
-        var currentNodes = allNodes.Where(n => MatchesSimpleSelector(n, tokens[0])).ToList(); 
+
+        var currNodes = GetAllNodes(root, method).Where(n => MatchSelector(n, tokens[0])).ToList();
         
-        List<DOMNode> traversalNodes = new List<DOMNode>(); // jujur ini bakal gede banget, kalo mw sebenernya bisa di allNodes but like yh
+        List<DOMNode> traversalNodes = new List<DOMNode>();
 
         // Filterrrrrrrrr
+        int lastToken = tokens.Count - 2;
+
         for (int i = 1; i < tokens.Count; i += 2) 
         {
             // ganjil janggal?
             if (i + 1 >= tokens.Count) break;
 
+            bool isLastToken = i == lastToken;
             string combinator = tokens[i];
             string nextSelector = tokens[i + 1];
             HashSet<DOMNode> nextNodes = new HashSet<DOMNode>();
 
-            foreach (var node in currentNodes)
+            foreach (var node in currNodes)
             {
+                if (maxSelected == 0) break;
                 traversalNodes.Add(node);
                 
                 if (combinator == " ") // Descendant 
@@ -52,23 +53,34 @@ public static class CSSSelector
                     var descendants = GetAllNodes(node, method).Skip(1);
                     foreach (var desc in descendants)
                     {
+                        if (maxSelected == 0) break;
                         traversalNodes.Add(desc);
-                        if (MatchesSimpleSelector(desc, nextSelector)) nextNodes.Add(desc);
+                        if (MatchSelector(desc, nextSelector)) 
+                        {
+                            if (isLastToken) maxSelected--;
+                            nextNodes.Add(desc);
+                        }
                     }
                 }
                 else if (combinator == ">") // Child
                 {
                     foreach (var child in node.Children)
                     {
+                        if (maxSelected == 0) break;
                         traversalNodes.Add(child);
-                        if (MatchesSimpleSelector(child, nextSelector)) nextNodes.Add(child);
+                        if (MatchSelector(child, nextSelector))
+                        {
+                            if (isLastToken) maxSelected--;
+                            nextNodes.Add(child);
+                        } 
                     }
                 }
                 else if (combinator == "+") // Adjacent Sibling
                 {
                     var sibling = GetNextElementSibling(node);
-                    if (sibling != null && MatchesSimpleSelector(sibling, nextSelector))
+                    if (sibling != null && MatchSelector(sibling, nextSelector))
                     {
+                        if (isLastToken) maxSelected--;
                         traversalNodes.Add(sibling);
                         nextNodes.Add(sibling);
                     }
@@ -78,16 +90,21 @@ public static class CSSSelector
                     var siblings = GetNextElementSiblings(node);
                     foreach (var sibling in siblings)
                     {
+                        if (maxSelected == 0) break;
                         traversalNodes.Add(sibling);
-                        if (MatchesSimpleSelector(sibling, nextSelector)) nextNodes.Add(sibling);
+                        if (MatchSelector(sibling, nextSelector))
+                        {
+                            if (isLastToken) maxSelected--;
+                            nextNodes.Add(sibling);
+                        } 
                     }
                 }
             }
             
-            currentNodes = nextNodes.ToList();
+            currNodes = nextNodes.ToList();
         }
 
-        return (currentNodes, traversalNodes);
+        return (currNodes, traversalNodes);
     }
 
     private static List<DOMNode> GetAllNodes(DOMNode startNode, TraversalMethod method)
@@ -133,7 +150,7 @@ public static class CSSSelector
         return result;
     }
 
-    private static bool MatchesSimpleSelector(DOMNode node, string selector)
+    private static bool MatchSelector(DOMNode node, string selector)
     {
         if (node.IsTextNode()) return false; 
         if (selector == "*") return true;    
