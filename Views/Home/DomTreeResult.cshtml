@@ -35,8 +35,8 @@
     var safeJson;
     var htmlTree;
     window.addEventListener('load', function () {
-        @* var safeJson = SanitizeJsonString(rawJson); *@
-        var htmlTree = JSON.parse(rawJson);
+        var safeJson = SanitizeJsonString(rawJson);
+        var htmlTree = JSON.parse(safeJson);
         document.getElementById("maxLevel").textContent = "Kedalaman Maksimal: " + htmlTree.MaxLevel;
         build(document.getElementById("result-tree"), htmlTree);
     });

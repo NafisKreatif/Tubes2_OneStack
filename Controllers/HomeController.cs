@@ -90,7 +90,7 @@ public class HomeController : Controller
         {
             DomTreeJson = model.DomTreeJson,
             CssSelector = model.CssSelector,
-            TraversalType = model.TraversalType,
+            TraversalType = model.TraversalType != null ? model.TraversalType.ToUpper() : "BFS",
             ResultCount = model.ResultCount,
             TimeSpanSecond = timeSpan.TotalSeconds,
             SelectedJson = JsonConvert.SerializeObject(selectedNodeIndex),

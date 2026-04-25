@@ -8,7 +8,7 @@
     <h1 class="display-5">@ViewData["Title"]</h1>
     <form method="POST" action="/Home/CssSelectorResult" enctype="multipart/form-data">
         <input type="text" id="CssSelector" name="CssSelector" placeholder="Insert CSS Selector"
-               class="my-2 text-md-start w-50 rounded-4 border-3 py-2 px-3" value="@Html.Raw(Model.CssSelector)" />
+               class="my-2 text-md-start w-50 rounded-4 border-3 py-2 px-3" value="@Model.CssSelector" />
         <div class="d-flex gap-2 justify-content-center my-2">
             <label for="TraversalType" class="my-auto">Traversal Type: </label>
             <select id="TraversalType" name="TraversalType" class="h-75 my-auto" value="@Html.Raw(Model.TraversalType)">
@@ -47,11 +47,9 @@
     let loop;
     function nextStep(infoMap = new Map(), selectedNode = [], traversalOrder = [], isSelecting = false) {
         if (isSelecting) {
-            console.log("Selecting: " + traversalOrder[index]);
             infoMap[traversalOrder[index]].classList.add("selected");
         }
         else {
-            console.log("Traversing: " + traversalOrder[index]);
             infoMap[traversalOrder[index]].classList.add("traversed");
         }
         if (!isSelecting && selectedNode.findIndex((v) => v == traversalOrder[index]) != -1) {
@@ -59,7 +57,9 @@
         }
         else {
             index++;
-            loop = setTimeout(() => nextStep(infoMap, selectedNode, traversalOrder), 100)
+            if (index < traversalOrder.length) {
+                loop = setTimeout(() => nextStep(infoMap, selectedNode, traversalOrder), 100)
+            }
         }
     }
 
@@ -76,17 +76,15 @@
     function stopAnimation() {
         clearTimeout(loop);
         for (let i = 0; i < traversalOrder.length; i++) {
-            console.log(traversalOrder[i]);
             infoMap[traversalOrder[i]].classList.add("traversed");
         }
         for (let i = 0; i < selectedNode.length; i++) {
-            console.log(selectedNode[i]);
             infoMap[selectedNode[i]].classList.add("selected");
         }
     }
     window.addEventListener('load', function () {
         safeJson = SanitizeJsonString(rawJson);
-        htmlTree = JSON.parse(rawJson);
+        htmlTree = JSON.parse(safeJson);
         traversalOrder = JSON.parse('@Html.Raw(Model.TraversalJson)');
         selectedNode = JSON.parse('@Html.Raw(Model.SelectedJson)');
         document.getElementById("maxLevel").textContent = "Kedalaman Maksimal: " + htmlTree.MaxLevel;
