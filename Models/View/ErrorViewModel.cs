@@ -1,4 +1,4 @@
-namespace DOMTreeTraversal.Models;
+namespace DOMTreeTraversal.Models.View;
 
 public class ErrorViewModel
 {

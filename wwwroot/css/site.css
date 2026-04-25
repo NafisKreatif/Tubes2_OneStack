@@ -31,8 +31,60 @@ body {
 }
 
 .node {
-  margin: 3px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 5px;
   border: double;
   border-width: 2;
   border-color: black;
+  min-width: 80px;
+  width: fit-content;
+}
+
+.node.traversed {
+  background-color: khaki;
+}
+
+.node.selected {
+  background-color: greenyellow;
+}
+
+.vertical-edge {
+  border-left: solid 2px;
+  min-height: 20px;
+  width: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.top-to-left-edge {
+  border-top: solid 2px;
+  border-right: solid 1px;
+  border-left: none;
+  border-bottom: none;
+  min-height: 20px;
+}
+
+.top-to-right-edge {
+  border-top: solid 2px;
+  border-right: none;
+  border-left: solid 1px;
+  border-bottom: none;
+  min-height: 20px;
+}
+
+.only-top-to-left-edge {
+  border-top: solid 2px;
+  border-right: solid 2px;
+  border-left: none;
+  border-bottom: none;
+  min-height: 20px;
+}
+
+.only-top-to-right-edge {
+  border-top: solid 2px;
+  border-right: none;
+  border-left: solid 2px;
+  border-bottom: none;
+  min-height: 20px;
 }

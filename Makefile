@@ -1,4 +1,4 @@
-all: clean run
+all: run
 
 clean:
 	dotnet clean

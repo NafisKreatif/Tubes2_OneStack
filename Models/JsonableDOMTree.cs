@@ -1,24 +1,28 @@
 using DOMTreeTraversal.Models;
 
-class JsonableDomTree
+class MappedDomTree
 {
     public int RootId { get; set; }
-    public Dictionary<int, JsonableDomNode> Nodes { get; set; }
-    public JsonableDomTree()
+    public int MaxLevel { get; set; }
+    public Dictionary<int, MappedDomNode> Nodes { get; set; }
+    public MappedDomTree()
     {
         RootId = 0;
+        MaxLevel = 0;
         Nodes = [];
     }
-    public JsonableDomTree(DOMTree tree)
+    public MappedDomTree(DOMTree tree)
     {
         RootId = tree.Root.NodeId;
+        MaxLevel = 0;
         Nodes = [];
         Queue<DOMNode> bfs = new();
+        Dictionary<DOMNode, int> level = [];
         bfs.Enqueue(tree.Root);
         while (bfs.Count > 0)
         {
             DOMNode node = bfs.Dequeue();
-            JsonableDomNode jsonable = new()
+            MappedDomNode jsonable = new()
             {
                 Index = node.NodeId,
                 Tag = node.Tag,
@@ -32,10 +36,14 @@ class JsonableDomTree
             {
                 jsonable.Parent = node.Parent.NodeId;
                 Nodes[jsonable.Parent].Children.Add(node.NodeId);
+                level[node] = level[node.Parent] + 1;
+                MaxLevel = Math.Max(MaxLevel, level[node]);
             }
             else
             {
                 jsonable.Parent = -1;
+                level[node] = 1;
+                MaxLevel = Math.Max(MaxLevel, level[node]);
             }
 
             Nodes[jsonable.Index] = jsonable;
@@ -47,7 +55,7 @@ class JsonableDomTree
     }
 }
 
-class JsonableDomNode
+class MappedDomNode
 {
     public int Index { get; set; }
     public string Tag { get; set; }
@@ -58,7 +66,7 @@ class JsonableDomNode
     public List<int> Children { get; set; }
     public int Parent { get; set; }
 
-    public JsonableDomNode()
+    public MappedDomNode()
     {
         Index = -1;
         Tag = "";

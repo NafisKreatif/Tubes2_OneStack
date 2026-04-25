@@ -4,11 +4,10 @@
 
 <div class="text-center">
     <h1 class="display-5">@ViewData["Title"]</h1>
-    <form method="POST" action="/Home/Result" enctype="multipart/form-data">
-
+    <form method="POST" action="/Home/DomTreeResult" enctype="multipart/form-data">
         <div class="d-flex mx-auto bg-white border-primary border border-3 rounded-4 justify-content-center overflow-hidden mt-4"
              style="width: fit-content;">
-            <input type="text" id="inputType" name="inputType" value="link" class="d-none"/>
+            <input type="text" id="InputType" name="InputType" value="link" class="d-none"/>
             <button type="button" id="inputWithLink" onclick="
             document.getElementById('inputWithLink').classList.remove('bg-white', 'text-black');
             document.getElementById('inputWithLink').classList.add('bg-primary', 'text-white');
@@ -19,7 +18,7 @@
             document.getElementById('linkInput').classList.remove('d-none');
             document.getElementById('fileInput').classList.add('d-none');
             document.getElementById('textInput').classList.add('d-none');
-            document.getElementById('inputType').value = 'link';
+            document.getElementById('InputType').value = 'link';
             " class="py-1 px-2 bg-primary text-white border-0">Input with link</button>
             <div class="border border-1 border-primary-subtle" style="width: 1px;"></div>
             <button type="button" id="inputWithFile" onclick="
@@ -32,7 +31,7 @@
             document.getElementById('linkInput').classList.add('d-none');
             document.getElementById('fileInput').classList.remove('d-none');
             document.getElementById('textInput').classList.add('d-none');
-            document.getElementById('inputType').value = 'file';
+            document.getElementById('InputType').value = 'file';
             " class="py-1 px-2 bg-white text-black border-0">Input with file</button>
             <div class="border border-1 border-primary-subtle" style="width: 1px;"></div>
             <button type="button" id="inputWithText" onclick="
@@ -45,12 +44,12 @@
             document.getElementById('linkInput').classList.add('d-none');
             document.getElementById('fileInput').classList.add('d-none');
             document.getElementById('textInput').classList.remove('d-none');
-            document.getElementById('inputType').value = 'text';
+            document.getElementById('InputType').value = 'text';
             " class="py-1 px-2 bg-white text-black border-0">Input with text</button>
         </div>
         <div class="my-2">
             <div id="linkInput">
-                <input type="text" id="htmlLink" name="link" placeholder="Insert web page link"
+                <input type="text" id="HtmlLink" name="HtmlLink" placeholder="Insert web page link"
                        class="text-lg-start w-75 rounded-4 border-3 py-2 px-3" />
             </div>
             <div id="fileInput" class="d-none">
@@ -58,26 +57,16 @@
                     class="d-flex justify-content-center mx-auto my-2 text-lg-start w-75 rounded-4 border border-black border-3 py-2 px-3"
                         onmouseenter="this.classList.add('bg-primary-subtle')"
                         onmouseleave="this.classList.remove('bg-primary-subtle')">
-                    <input type="file" id="htmlFile" name="htmlFile" accept=".html, .txt" class="d-none"
+                    <input type="file" id="HtmlFile" name="HtmlFile" accept=".html, .txt" class="d-none"
                            onchange="document.getElementById('fileName').innerText = 'Uploaded file: ' + this.value.split('\\').pop()" />
                     <p id="fileName" class="my-auto text-black-50">Upload file (.txt, .html)</p>
                 </label>
             </div>
             <div id="textInput" class="d-none">
-                <textarea type="text" id="htmlText" name="htmlText" placeholder="Insert html text" rows="12"
+                <textarea type="text" id="HtmlText" name="HtmlText" placeholder="Insert html text" rows="12"
                           class="mx-auto py-2 px-3 text-lg-start w-75 rounded-3 border-3 h-50"></textarea>
             </div>
         </div>
-        
-        <input type="text" id="cssSelector" name="cssSelector" placeholder="Insert CSS Selector"
-               class="my-2 text-md-start w-50 rounded-4 border-3 py-2 px-3" />
-        <div class="d-flex gap-2 justify-content-center my-2">
-            <label for="traversalType">Traversal Type</label>
-            <select id="traversalType" name="traversalType">
-                <option value="bfs">BFS</option>
-                <option value="dfs">DFS</option>
-            </select>
-        </div>
-        <button type="submit" class="my-2 py-1 px-3 bg-success border-3 border-success-subtle rounded-3 text-white">Submit</button>
+        <button type="submit" class="my-2 py-1 px-3 bg-success border-3 border-success-subtle rounded-3 text-white">Parse HTML into Tree</button>
     </form>
 </div>

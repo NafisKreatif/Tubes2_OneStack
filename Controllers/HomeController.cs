@@ -1,8 +1,10 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using DOMTreeTraversal.Models;
+using DOMTreeTraversal.Models.View;
+using DOMTreeTraversal.Models.Input;
 using DOMTreeTraversal.Test;
 using System.Text.Json;
+using DOMTreeTraversal.Models;
 
 namespace DOMTreeTraversal.Controllers;
 
@@ -19,32 +21,38 @@ public class HomeController : Controller
     }
 
     [HttpPost]
-    public IActionResult Result([Bind("link", "htmlText", "inputType", "traversalType")] InputModel model, IFormFile htmlFile)
+    public IActionResult DomTreeResult([Bind("HtmlLink", "HtmlText", "InputType")] HtmlInputModel model, IFormFile htmlFile)
     {
-        Console.WriteLine(model.inputType);
         string html = "";
-        switch (model.inputType)
+        switch (model.InputType)
         {
             case "link":
-                html = model.link ?? "";
+                html = model.HtmlLink ?? "";
                 break;
             case "file":
                 if (htmlFile != null && htmlFile.Length > 0) html = htmlFile.FileName ?? "";
                 break;
             case "text":
-                html = model.htmlText ?? "";
+                html = model.HtmlText ?? "";
                 break;
             default:
                 break;
         }
 
-        JsonableDomTree test = new(DOMTreeStub.GetTestCase1());
-        Console.WriteLine(JsonSerializer.Serialize(test));
-        foreach (KeyValuePair<int, JsonableDomNode> item in test.Nodes)
+        return View(new DomTreeViewModel(TestCase1.GetDomTree()));
+    }
+
+    [HttpPost]
+    public IActionResult CssSelectorResult([Bind("DomTreeJson", "CssSelector", "TraversalType")] CssSelectorInputModel model)
+    {
+        return View(new CssSelectorViewModel
         {
-            Console.WriteLine(item.Key + ": " + item.Value.Tag);
-        }
-        return View(new JsonModel(JsonSerializer.Serialize(test)));
+            DomTreeJson = model.DomTreeJson,
+            CssSelector = model.CssSelector,
+            TraversalType = model.TraversalType,
+            SelectedJson = JsonSerializer.Serialize(TestCase1.GetSelectedNode()),
+            TraversalJson = JsonSerializer.Serialize(TestCase1.GetTraversalOrder())
+        });
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
