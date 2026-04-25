@@ -21,6 +21,7 @@ public static class CSSSelector
     }
     public static (List<DOMNode>, TimeSpan) QuerySelector(DOMNode root, string selector, int maxSelected, TraversalMethod method = TraversalMethod.DFS)
     {
+        traversalNodes = new();
         if (string.IsNullOrWhiteSpace(selector)) return (new List<DOMNode>(), new TimeSpan()); 
 
         var tokens = TokenizeSelector(selector);

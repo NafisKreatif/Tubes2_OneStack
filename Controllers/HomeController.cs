@@ -66,19 +66,23 @@ public class HomeController : Controller
         {
             domTree = new MappedDomTree();
         }
-        List<int> selectedNode = new();
-        List<int> traversedNode = new();
-        foreach (var item in domTree.Nodes)
+        var (selectedNode, timeSpan) = CSSSelector.QuerySelector(
+            new DOMTree(domTree),
+            model.CssSelector ?? "",
+            model.ResultCount ?? 1,
+            model.TraversalType == "bfs" ? TraversalMethod.BFS : TraversalMethod.DFS
+        );
+        var traversedNode = CSSSelector.traversalNodes;
+
+        List<int> selectedNodeIndex = new ();
+        List<int> traversedNodeIndex = new ();
+        foreach (var node in selectedNode)
         {
-            if (item.Value.Parent == -1) continue;
-            if (Random.Shared.NextInt64() % 4 == 0)
-            {
-                selectedNode.Add(item.Key);
-            }
-            if (Random.Shared.NextInt64() % 2 == 0)
-            {
-                traversedNode.Add(item.Key);
-            }
+            selectedNodeIndex.Add(node.NodeId);
+        }
+        foreach (var node in selectedNode)
+        {
+            traversedNodeIndex.Add(node.NodeId);
         }
         return View(new CssSelectorViewModel
         {
@@ -86,8 +90,9 @@ public class HomeController : Controller
             CssSelector = model.CssSelector,
             TraversalType = model.TraversalType,
             ResultCount = model.ResultCount,
-            SelectedJson = JsonConvert.SerializeObject(selectedNode),
-            TraversalJson = JsonConvert.SerializeObject(traversedNode)
+            TimeSpanSecond = timeSpan.TotalSeconds,
+            SelectedJson = JsonConvert.SerializeObject(selectedNodeIndex),
+            TraversalJson = JsonConvert.SerializeObject(traversedNodeIndex)
         });
     }
 
