@@ -155,7 +155,7 @@ function SanitizeJsonString(rawString) {
         '\f': '\\f',
         '\n': '\\n',
         '\r': '\\r',
-        '\t': '\\t',
+        '\t': '\\t'
       };
       return charMap[chr] || '';
     });

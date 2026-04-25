@@ -10,5 +10,5 @@ public class DomTreeViewModel(DOMTree domTree)
         new JsonSerializerSettings()
         {
             StringEscapeHandling = StringEscapeHandling.EscapeHtml
-        }).Replace("\\", "\\\\");
+        }).Replace("\\", "\\\\").Replace("'", "\\'");
 }

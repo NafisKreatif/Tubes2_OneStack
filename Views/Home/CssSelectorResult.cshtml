@@ -24,6 +24,7 @@
         </div>
         <input type="text" id="domTreeJson" name="domTreeJson" value='@Html.Raw(Model.DomTreeJson)' hidden />
     </form>
+    <h4 id="nodeCount">Banyak Hasil: @Html.Raw(@Model.TimeSpanSecond) detik</h4>
     <h4 id="timeExecution">Waktu Eksekusi: @Html.Raw(@Model.TimeSpanSecond) detik</h4>
     <div class="d-flex gap-2 justify-content-center">
         <button id="startAnimation" class="bg-primary text-white" onclick="startAnimation()">Restart Animation</button>
@@ -35,7 +36,7 @@
 </div>
 
 <script>
-    var rawJson = `@Html.Raw(Model.DomTreeJson)`;
+    var rawJson = '@Html.Raw(Model.DomTreeJson)';
     var safeJson;
     var htmlTree;
     var traversalOrder;
@@ -54,11 +55,11 @@
             infoMap[traversalOrder[index]].classList.add("traversed");
         }
         if (!isSelecting && selectedNode.findIndex((v) => v == traversalOrder[index]) != -1) {
-            loop = setTimeout(() => nextStep(infoMap, selectedNode, traversalOrder, true), 300)
+            loop = setTimeout(() => nextStep(infoMap, selectedNode, traversalOrder, true), 100)
         }
         else {
             index++;
-            loop = setTimeout(() => nextStep(infoMap, selectedNode, traversalOrder), 300)
+            loop = setTimeout(() => nextStep(infoMap, selectedNode, traversalOrder), 100)
         }
     }
 
@@ -70,7 +71,7 @@
             }
         }
         index = 0;
-        loop = setTimeout(nextStep(infoMap, selectedNode, traversalOrder), 300);
+        loop = setTimeout(nextStep(infoMap, selectedNode, traversalOrder), 100);
     }
     function stopAnimation() {
         clearTimeout(loop);
@@ -89,6 +90,7 @@
         traversalOrder = JSON.parse('@Html.Raw(Model.TraversalJson)');
         selectedNode = JSON.parse('@Html.Raw(Model.SelectedJson)');
         document.getElementById("maxLevel").textContent = "Kedalaman Maksimal: " + htmlTree.MaxLevel;
+        document.getElementById("nodeCount").textContent = "Banyak Hasil: " + selectedNode.length;
         build(document.getElementById("result-tree"), htmlTree, infoMap);
         startAnimation();
     });
