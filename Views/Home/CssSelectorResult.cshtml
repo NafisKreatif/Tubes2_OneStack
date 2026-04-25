@@ -8,7 +8,7 @@
     <h1 class="display-5">@ViewData["Title"]</h1>
     <form method="POST" action="/Home/CssSelectorResult" enctype="multipart/form-data">
         <input type="text" id="CssSelector" name="CssSelector" placeholder="Insert CSS Selector"
-               class="my-2 text-md-start w-50 rounded-4 border-3 py-2 px-3" value="@Html.Raw(Model.CssSelector)" />
+               class="my-2 text-md-start w-50 rounded-4 border-3 py-2 px-3" value="@Model.CssSelector" />
         <div class="d-flex gap-2 justify-content-center my-2">
             <label for="TraversalType" class="my-auto">Traversal Type: </label>
             <select id="TraversalType" name="TraversalType" class="h-75 my-auto" value="@Html.Raw(Model.TraversalType)">

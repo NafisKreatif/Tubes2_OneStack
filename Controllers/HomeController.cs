@@ -56,6 +56,7 @@ public class HomeController : Controller
     [HttpPost]
     public IActionResult CssSelectorResult([Bind("DomTreeJson", "CssSelector", "TraversalType", "ResultCount")] CssSelectorInputModel model)
     {
+        Console.WriteLine(model.CssSelector);
         MappedDomTree domTree;
 
         if (model.DomTreeJson != null)
@@ -90,7 +91,7 @@ public class HomeController : Controller
         {
             DomTreeJson = model.DomTreeJson,
             CssSelector = model.CssSelector,
-            TraversalType = model.TraversalType,
+            TraversalType = model.TraversalType != null ? model.TraversalType.ToUpper() : "BFS",
             ResultCount = model.ResultCount,
             TimeSpanSecond = timeSpan.TotalSeconds,
             SelectedJson = JsonConvert.SerializeObject(selectedNodeIndex),
