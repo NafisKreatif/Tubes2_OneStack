@@ -70,7 +70,7 @@ public static class CSSSelector
                         traversalNodes.Add(desc);
                         if (MatchSelector(desc, nextSelector)) 
                         {
-                            if (isLastToken && nextNodes.Add(desc)) maxSelected--;
+                            if (nextNodes.Add(desc) && isLastToken) maxSelected--;
                         }
                     }
                 }
@@ -82,7 +82,7 @@ public static class CSSSelector
                         traversalNodes.Add(child);
                         if (MatchSelector(child, nextSelector))
                         {
-                            if (isLastToken && nextNodes.Add(child)) maxSelected--;
+                            if (nextNodes.Add(child) && isLastToken) maxSelected--;
                         } 
                     }
                 }
@@ -92,7 +92,7 @@ public static class CSSSelector
                     if (sibling != null) traversalNodes.Add(sibling);
                     if (sibling != null && MatchSelector(sibling, nextSelector))
                     {
-                        if (isLastToken && nextNodes.Add(sibling)) maxSelected--;
+                        if (nextNodes.Add(sibling)  && isLastToken) maxSelected--;
                     }
                 }
                 else if (combinator == "~") // General Sibling
@@ -104,7 +104,7 @@ public static class CSSSelector
                         traversalNodes.Add(sibling);
                         if (MatchSelector(sibling, nextSelector))
                         {
-                            if (isLastToken && nextNodes.Add(sibling)) maxSelected--;
+                            if (nextNodes.Add(sibling) && isLastToken) maxSelected--;
                         } 
                     }
                 }
