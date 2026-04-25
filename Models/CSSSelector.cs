@@ -14,17 +14,18 @@ public enum TraversalMethod
 
 public static class CSSSelector
 {
-    public static (List<DOMNode>, List<DOMNode>) QuerySelector(DOMTree tree, string selector, int maxSelected, TraversalMethod method = TraversalMethod.DFS)
+    public static (List<DOMNode>, List<DOMNode>, TimeSpan) QuerySelector(DOMTree tree, string selector, int maxSelected, TraversalMethod method = TraversalMethod.DFS)
     {
         return QuerySelector(tree.Root, selector, maxSelected, method);
     }
-    public static (List<DOMNode>, List<DOMNode>) QuerySelector(DOMNode root, string selector, int maxSelected, TraversalMethod method = TraversalMethod.DFS)
+    public static (List<DOMNode>, List<DOMNode>, TimeSpan) QuerySelector(DOMNode root, string selector, int maxSelected, TraversalMethod method = TraversalMethod.DFS)
     {
-        if (string.IsNullOrWhiteSpace(selector)) return (new List<DOMNode>(), new List<DOMNode>()); 
+        if (string.IsNullOrWhiteSpace(selector)) return (new List<DOMNode>(), new List<DOMNode>(), new TimeSpan()); 
 
         var tokens = TokenizeSelector(selector);
-        if (tokens.Count == 0) return (new List<DOMNode>(), new List<DOMNode>());
-
+        if (tokens.Count == 0) return (new List<DOMNode>(), new List<DOMNode>(), new TimeSpan());
+        
+        DateTime startTime = DateTime.Now;
 
         var currNodes = GetAllNodes(root, method).Where(n => MatchSelector(n, tokens[0])).ToList();
         
@@ -104,7 +105,10 @@ public static class CSSSelector
             currNodes = nextNodes.ToList();
         }
 
-        return (currNodes, traversalNodes);
+        DateTime endTime = DateTime.Now;
+        TimeSpan runTime = endTime - startTime;
+
+        return (currNodes, traversalNodes, runTime);
     }
 
     private static List<DOMNode> GetAllNodes(DOMNode startNode, TraversalMethod method)
