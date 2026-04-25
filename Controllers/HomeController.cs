@@ -66,7 +66,6 @@ public class HomeController : Controller
         {
             domTree = new MappedDomTree();
         }
-        Console.WriteLine(model.ResultCount);
         var (selectedNode, timeSpan) = CSSSelector.QuerySelector(
             new DOMTree(domTree),
             model.CssSelector ?? "",
@@ -75,8 +74,8 @@ public class HomeController : Controller
         );
         var traversedNode = CSSSelector.traversalNodes;
 
-        List<int> selectedNodeIndex = new ();
-        List<int> traversedNodeIndex = new ();
+        List<int> selectedNodeIndex = new();
+        List<int> traversedNodeIndex = new();
         foreach (var node in selectedNode)
         {
             if (node.Parent == null) continue;

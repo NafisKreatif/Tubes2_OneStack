@@ -24,6 +24,11 @@
         </div>
         <input type="text" id="domTreeJson" name="domTreeJson" value='@Html.Raw(Model.DomTreeJson)' hidden />
     </form>
+    <h4 id="timeExecution">Waktu Eksekusi: @Html.Raw(@Model.TimeSpanSecond) detik</h4>
+    <div class="d-flex gap-2 justify-content-center">
+        <button id="startAnimation" class="bg-primary text-white" onclick="startAnimation()">Restart Animation</button>
+        <button id="skipAnimation" class="bg-primary text-white" onclick="stopAnimation()">Skip Animation</button>
+    </div>
     <h4 id="maxLevel">Kedalaman Maksimal: </h4>
     <div id="result-tree" class="overflow-x-scroll border border-2">
     </div>
@@ -36,6 +41,48 @@
     var traversalOrder;
     var selectedNode;
     let infoMap = new Map();
+
+    let index = 0;
+    let loop;
+    function nextStep(infoMap = new Map(), selectedNode = [], traversalOrder = [], isSelecting = false) {
+        if (isSelecting) {
+            console.log("Selecting: " + traversalOrder[index]);
+            infoMap[traversalOrder[index]].classList.add("selected");
+        }
+        else {
+            console.log("Traversing: " + traversalOrder[index]);
+            infoMap[traversalOrder[index]].classList.add("traversed");
+        }
+        if (!isSelecting && selectedNode.findIndex((v) => v == traversalOrder[index]) != -1) {
+            loop = setTimeout(() => nextStep(infoMap, selectedNode, traversalOrder, true), 300)
+        }
+        else {
+            index++;
+            loop = setTimeout(() => nextStep(infoMap, selectedNode, traversalOrder), 300)
+        }
+    }
+
+    function startAnimation() {
+        clearTimeout(loop);
+        for (var i in infoMap) {
+            if (Object.prototype.hasOwnProperty.call(infoMap, i)) {
+                infoMap[i].classList.remove("traversed", "selected");
+            }
+        }
+        index = 0;
+        loop = setTimeout(nextStep(infoMap, selectedNode, traversalOrder), 300);
+    }
+    function stopAnimation() {
+        clearTimeout(loop);
+        for (let i = 0; i < traversalOrder.length; i++) {
+            console.log(traversalOrder[i]);
+            infoMap[traversalOrder[i]].classList.add("traversed");
+        }
+        for (let i = 0; i < selectedNode.length; i++) {
+            console.log(selectedNode[i]);
+            infoMap[selectedNode[i]].classList.add("selected");
+        }
+    }
     window.addEventListener('load', function () {
         safeJson = SanitizeJsonString(rawJson);
         htmlTree = JSON.parse(rawJson);
@@ -43,11 +90,6 @@
         selectedNode = JSON.parse('@Html.Raw(Model.SelectedJson)');
         document.getElementById("maxLevel").textContent = "Kedalaman Maksimal: " + htmlTree.MaxLevel;
         build(document.getElementById("result-tree"), htmlTree, infoMap);
-        for (let i = 0; i < traversalOrder.length; i++) {
-            infoMap[traversalOrder[i]].classList.add("traversed");
-        }
-        for (let i = 0; i < selectedNode.length; i++) {
-            infoMap[selectedNode[i]].classList.add("selected");
-        }
+        startAnimation();
     });
 </script>
