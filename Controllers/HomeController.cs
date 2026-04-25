@@ -56,13 +56,36 @@ public class HomeController : Controller
     [HttpPost]
     public IActionResult CssSelectorResult([Bind("DomTreeJson", "CssSelector", "TraversalType")] CssSelectorInputModel model)
     {
+        MappedDomTree domTree;
+
+        if (model.DomTreeJson != null)
+        {
+            domTree = JsonSerializer.Deserialize<MappedDomTree>(model.DomTreeJson) ?? new MappedDomTree();
+        }
+        else
+        {
+            domTree = new MappedDomTree();
+        }
+        List<int> selectedNode = new();
+        List<int> traversedNode = new();
+        foreach (var item in domTree.Nodes)
+        {
+            if (Random.Shared.NextInt64() % 4 == 0)
+            {
+                selectedNode.Add(item.Key);
+            }
+            if (Random.Shared.NextInt64() % 2 == 0)
+            {
+                traversedNode.Add(item.Key);
+            }
+        }
         return View(new CssSelectorViewModel
         {
             DomTreeJson = model.DomTreeJson,
             CssSelector = model.CssSelector,
             TraversalType = model.TraversalType,
-            SelectedJson = JsonSerializer.Serialize(TestCase1.GetSelectedNode()),
-            TraversalJson = JsonSerializer.Serialize(TestCase1.GetTraversalOrder())
+            SelectedJson = JsonSerializer.Serialize(selectedNode),
+            TraversalJson = JsonSerializer.Serialize(traversedNode)
         });
     }
 
