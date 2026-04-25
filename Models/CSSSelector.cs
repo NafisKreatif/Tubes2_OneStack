@@ -36,6 +36,7 @@ public static class CSSSelector
             int i = 0;
             foreach (var nodes in currNodes)
             {
+                if (nodes == root) continue;
                 if (i < maxSelected) temp.Add(nodes);
                 else break;
                 i++;
