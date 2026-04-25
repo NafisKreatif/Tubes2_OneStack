@@ -37,7 +37,7 @@ body {
   border: double;
   border-width: 2;
   border-color: black;
-  min-width: 80px;
+  min-width: 125px;
   width: fit-content;
 }
 

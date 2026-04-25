@@ -28,13 +28,9 @@
 </div>
 
 <script>
-    const rawJson = `@Html.Raw(Model.DomTreeJson)`;
-    var safeJson;
-    var htmlTree;
+    const htmlTree = JSON.parse(`@Html.Raw(Model.DomTreeJson)`);
+    document.getElementById("maxLevel").textContent = "Kedalaman Maksimal: " + htmlTree.MaxLevel;
     window.addEventListener('load', function () {
-        safeJson = SanitizeJsonString(rawJson);
-        htmlTree = JSON.parse(safeJson);
-        document.getElementById("maxLevel").textContent = "Kedalaman Maksimal: " + htmlTree.MaxLevel;
         build(document.getElementById("result-tree"), htmlTree);
     });
 </script>

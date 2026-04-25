@@ -77,12 +77,13 @@ function build(element = document.createElement("div"), htmlTree, infoMap = new 
             let infos = document.createElement("div");
             infos.classList.add("node");
             infoContainer.appendChild(infos);
-
             infoMap[currentNode.Index] = infos;
 
             // Create infos
             let tagText = document.createElement("p");
-            tagText.textContent = "<" + currentNode.Tag + ">";
+            if (currentNode.Tag != "") {
+                tagText.textContent = "<" + currentNode.Tag + ">";
+            }
             tagText.classList.add("m-auto")
             infos.appendChild(tagText);
             let separator = document.createElement("hr");
@@ -91,23 +92,30 @@ function build(element = document.createElement("div"), htmlTree, infoMap = new 
 
             if (currentNode.Id != "") {
                 let idText = document.createElement("p");
-                idText.textContent = "id: " + currentNode.Id;
+                idText.textContent = "id: \"" + currentNode.Id + "\"";
                 idText.classList.add("text-start", "my-0");
                 infos.appendChild(idText);
             }
 
             if (currentNode.Class.length > 0) {
                 let classText = document.createElement("p");
-                classText.textContent = "class: " + currentNode.Class;
+                classText.textContent = "class: \"" + currentNode.Class + "\"";
                 classText.classList.add("text-start", "my-0");
                 infos.appendChild(classText);
             }
 
-            if (currentNode.Attribute.length > 0) {
+            Object.keys(currentNode.Attribute).forEach(function(key,index) {
                 let attributeText = document.createElement("p");
-                attributeText.textContent = "attributes: " + currentNode.Attribute;
+                attributeText.textContent = key + ": \"" + currentNode.Attribute[key] + "\"";
                 attributeText.classList.add("text-start", "my-0");
                 infos.appendChild(attributeText);
+            });
+
+            if (currentNode.Text != "") {
+                let textText = document.createElement("p");
+                textText.textContent = "innerText: \"" + currentNode.Text + "\"";
+                textText.classList.add("text-start", "my-0");
+                infos.appendChild(textText);
             }
             
             if (currentNode.Children.length > 0) {
@@ -132,18 +140,3 @@ function build(element = document.createElement("div"), htmlTree, infoMap = new 
         }
     }
 }
-
-function SanitizeJsonString(rawString) {
-    return rawString
-    .replace(/[\x00-\x1F\x7F-\x9F]/g, (chr) => {
-      // Map common control characters to their escaped versions
-      const charMap = {
-        '\b': '\\b',
-        '\f': '\\f',
-        '\n': '\\n',
-        '\r': '\\r',
-        '\t': '\\t'
-      };
-      return charMap[chr] || ''; // Replace others with an empty string
-    });
-};

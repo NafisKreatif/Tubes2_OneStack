@@ -27,9 +27,7 @@
 </div>
 
 <script>
-    const rawJson = `@Html.Raw(Model.DomTreeJson)`;
-    const safeJson = rawJson.replace("\n", "\\n");
-    const htmlTree = JSON.parse(safeJson);
+    const htmlTree = JSON.parse(`@Html.Raw(Model.DomTreeJson)`);
     const traversalOrder = JSON.parse('@Html.Raw(Model.TraversalJson)');
     const selectedNode = JSON.parse('@Html.Raw(Model.SelectedJson)');
     document.getElementById("maxLevel").textContent = "Kedalaman Maksimal: " + htmlTree.MaxLevel;
