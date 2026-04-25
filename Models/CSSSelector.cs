@@ -30,7 +30,7 @@ public static class CSSSelector
         DateTime startTime = DateTime.Now;
 
         var currNodes = GetNodes(root, method, n => MatchSelector(n, tokens[0]));
-        if (tokens.Count == 0 && currNodes.Count > maxSelected)
+        if (tokens.Count == 1 && currNodes.Count > maxSelected)
         {
             var temp = new List<DOMNode>();
             int i = 0;
@@ -40,6 +40,7 @@ public static class CSSSelector
                 else break;
                 i++;
             }
+            currNodes = temp;
         }
         
         // Filterrrrrrrrr
