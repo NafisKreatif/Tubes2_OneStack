@@ -84,7 +84,7 @@ function build(element = document.createElement("div"), htmlTree, infoMap = new 
             if (currentNode.Tag != "") {
                 tagText.textContent = "<" + currentNode.Tag + ">";
             }
-            tagText.classList.add("m-auto")
+            tagText.classList.add("m-auto", "h5")
             infos.appendChild(tagText);
             let separator = document.createElement("hr");
             separator.classList.add("my-1")
@@ -105,6 +105,7 @@ function build(element = document.createElement("div"), htmlTree, infoMap = new 
             }
 
             Object.keys(currentNode.Attribute).forEach(function(key,index) {
+                if (key == "id" || key == "class") return;
                 let attributeText = document.createElement("p");
                 attributeText.textContent = key + ": \"" + currentNode.Attribute[key] + "\"";
                 attributeText.classList.add("text-start", "my-0");
@@ -113,7 +114,9 @@ function build(element = document.createElement("div"), htmlTree, infoMap = new 
 
             if (currentNode.Text != "") {
                 let textText = document.createElement("p");
-                textText.textContent = "innerText: \"" + currentNode.Text + "\"";
+                let innerText = currentNode.Text.replace(/,/g, ", ");
+                console.log(innerText);
+                textText.textContent = "innerText: \"" + innerText + "\"";
                 textText.classList.add("text-start", "my-0");
                 infos.appendChild(textText);
             }
@@ -140,3 +143,20 @@ function build(element = document.createElement("div"), htmlTree, infoMap = new 
         }
     }
 }
+
+// Do not ask me where I got this...
+// Keknya regex untuk karakter dengan kode 0-31
+function SanitizeJsonString(rawString) {
+    return rawString
+    .replace(/[\x00-\x1F\x7F-\x9F]/g, (chr) => {
+      // Map common control characters to their escaped versions
+      const charMap = {
+        '\b': '\\b',
+        '\f': '\\f',
+        '\n': '\\n',
+        '\r': '\\r',
+        '\t': '\\t',
+      };
+      return charMap[chr] || '';
+    });
+};

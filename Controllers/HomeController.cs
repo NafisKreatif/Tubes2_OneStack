@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using DOMTreeTraversal.Models.View;
 using DOMTreeTraversal.Models.Input;
 using DOMTreeTraversal.Test;
-using System.Text.Json;
 using DOMTreeTraversal.Models;
+using Newtonsoft.Json;
 
 namespace DOMTreeTraversal.Controllers;
 
@@ -60,7 +60,7 @@ public class HomeController : Controller
 
         if (model.DomTreeJson != null)
         {
-            domTree = JsonSerializer.Deserialize<MappedDomTree>(model.DomTreeJson) ?? new MappedDomTree();
+            domTree = JsonConvert.DeserializeObject<MappedDomTree>(model.DomTreeJson) ?? new MappedDomTree();
         }
         else
         {
@@ -70,6 +70,7 @@ public class HomeController : Controller
         List<int> traversedNode = new();
         foreach (var item in domTree.Nodes)
         {
+            if (item.Value.Parent == -1) continue;
             if (Random.Shared.NextInt64() % 4 == 0)
             {
                 selectedNode.Add(item.Key);
@@ -85,8 +86,8 @@ public class HomeController : Controller
             CssSelector = model.CssSelector,
             TraversalType = model.TraversalType,
             ResultCount = model.ResultCount,
-            SelectedJson = JsonSerializer.Serialize(selectedNode),
-            TraversalJson = JsonSerializer.Serialize(traversedNode)
+            SelectedJson = JsonConvert.SerializeObject(selectedNode),
+            TraversalJson = JsonConvert.SerializeObject(traversedNode)
         });
     }
 

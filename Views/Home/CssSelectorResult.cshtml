@@ -17,7 +17,8 @@
             </select>
             <div></div>
             <label for="ResultCount" class="my-auto">Result Count</label>
-            <input id="ResultCount" name="ResultCount" type="number" min="1" value="@Html.Raw(Model.ResultCount)" class="h-75 my-auto" style="width: 6rem;"/> 
+            <input id="ResultCount" name="ResultCount" type="number" min="1" value="@Html.Raw(Model.ResultCount)"
+                   class="h-75 my-auto" style="width: 6rem;" />
             <button type="submit"
                     class="my-2 py-1 px-3 bg-primary border-3 border-success-subtle rounded-3 text-white">Search</button>
         </div>
@@ -29,12 +30,18 @@
 </div>
 
 <script>
-    const htmlTree = JSON.parse(`@Html.Raw(Model.DomTreeJson)`);
-    const traversalOrder = JSON.parse('@Html.Raw(Model.TraversalJson)');
-    const selectedNode = JSON.parse('@Html.Raw(Model.SelectedJson)');
-    document.getElementById("maxLevel").textContent = "Kedalaman Maksimal: " + htmlTree.MaxLevel;
+    var rawJson = `@Html.Raw(Model.DomTreeJson)`;
+    var safeJson;
+    var htmlTree;
+    var traversalOrder;
+    var selectedNode;
+    let infoMap = new Map();
     window.addEventListener('load', function () {
-        let infoMap = new Map();
+        safeJson = SanitizeJsonString(rawJson);
+        htmlTree = JSON.parse(rawJson);
+        traversalOrder = JSON.parse('@Html.Raw(Model.TraversalJson)');
+        selectedNode = JSON.parse('@Html.Raw(Model.SelectedJson)');
+        document.getElementById("maxLevel").textContent = "Kedalaman Maksimal: " + htmlTree.MaxLevel;
         build(document.getElementById("result-tree"), htmlTree, infoMap);
         for (let i = 0; i < traversalOrder.length; i++) {
             infoMap[traversalOrder[i]].classList.add("traversed");

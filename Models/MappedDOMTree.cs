@@ -32,6 +32,10 @@ public class MappedDomTree
                 Attribute = node.Attribute,
                 Children = []
             };
+            if (node.Text.Length > 0)
+            {
+                // Console.WriteLine(node.Text);
+            }
             if (node.Parent != null)
             {
                 jsonable.Parent = node.Parent.NodeId;

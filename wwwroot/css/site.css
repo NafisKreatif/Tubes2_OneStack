@@ -39,14 +39,16 @@ body {
   border-color: black;
   min-width: 125px;
   width: fit-content;
+  box-shadow: 6px 6px 3px gray;
 }
 
 .node.traversed {
-  background-color: khaki;
+  background-color: gold;
 }
 
 .node.selected {
-  background-color: greenyellow;
+  background-color: limegreen;
+  border: solid 4px;
 }
 
 .vertical-edge {
