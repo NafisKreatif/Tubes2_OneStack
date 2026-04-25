@@ -10,7 +10,7 @@ public enum TraversalMethod
 {
     DFS,    
     BFS
-}
+} 
 
 public static class CSSSelector
 {
@@ -27,7 +27,7 @@ public static class CSSSelector
         
         DateTime startTime = DateTime.Now;
 
-        var currNodes = GetAllNodes(root, method).Where(n => MatchSelector(n, tokens[0])).ToList();
+        var currNodes = GetNodes(root, method, n => MatchSelector(n, tokens[0]));
         
         List<DOMNode> traversalNodes = new List<DOMNode>();
 
@@ -51,7 +51,7 @@ public static class CSSSelector
                 
                 if (combinator == " ") // Descendant 
                 {
-                    var descendants = GetAllNodes(node, method).Skip(1);
+                    var descendants = GetNodes(node, method, n => MatchSelector(n, nextSelector));
                     foreach (var desc in descendants)
                     {
                         if (maxSelected == 0) break;
@@ -111,30 +111,27 @@ public static class CSSSelector
         return (currNodes, traversalNodes, runTime);
     }
 
-    private static List<DOMNode> GetAllNodes(DOMNode startNode, TraversalMethod method)
+    private static List<DOMNode> GetNodes(DOMNode startNode, TraversalMethod method, Func<DOMNode, bool> condition)
     {
         return method == TraversalMethod.DFS 
-            ? GetNodesDFS(startNode) 
-            : GetNodesBFS(startNode);
+            ? GetNodesDFS(startNode, condition) 
+            : GetNodesBFS(startNode, condition);
     }
 
-    private static List<DOMNode> GetNodesDFS(DOMNode node)
+    private static List<DOMNode> GetNodesDFS(DOMNode node, Func<DOMNode, bool> condition)
     {
         var result = new List<DOMNode>();
-        TraverseDFS(node, result);
+        TraverseDFS(node, result, condition);
         return result;
     }
 
-    private static void TraverseDFS(DOMNode node, List<DOMNode> result)
+    private static void TraverseDFS(DOMNode node, List<DOMNode> result, Func<DOMNode, bool> condition)
     {
-        result.Add(node);
-        foreach (var child in node.Children)
-        {
-            TraverseDFS(child, result);
-        }
+        if (condition(node)) result.Add(node);
+        foreach (var child in node.Children) TraverseDFS(child, result, condition);
     }
 
-    private static List<DOMNode> GetNodesBFS(DOMNode startNode)
+    private static List<DOMNode> GetNodesBFS(DOMNode startNode, Func<DOMNode, bool> condition)
     {
         var result = new List<DOMNode>();
         var queue = new Queue<DOMNode>();
@@ -143,12 +140,9 @@ public static class CSSSelector
         while (queue.Count > 0)
         {
             var current = queue.Dequeue();
-            result.Add(current);
+            if (condition(current)) result.Add(current);
 
-            foreach (var child in current.Children)
-            {
-                queue.Enqueue(child);
-            }
+            foreach (var child in current.Children) queue.Enqueue(child);
         }
 
         return result;
