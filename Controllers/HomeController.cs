@@ -84,6 +84,7 @@ public class HomeController : Controller
             DomTreeJson = model.DomTreeJson,
             CssSelector = model.CssSelector,
             TraversalType = model.TraversalType,
+            ResultCount = model.ResultCount,
             SelectedJson = JsonSerializer.Serialize(selectedNode),
             TraversalJson = JsonSerializer.Serialize(traversedNode)
         });
