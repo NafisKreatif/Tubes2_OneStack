@@ -54,7 +54,7 @@ public class HomeController : Controller
     }
 
     [HttpPost]
-    public IActionResult CssSelectorResult([Bind("DomTreeJson", "CssSelector", "TraversalType")] CssSelectorInputModel model)
+    public IActionResult CssSelectorResult([Bind("DomTreeJson", "CssSelector", "TraversalType", "ResultCount")] CssSelectorInputModel model)
     {
         MappedDomTree domTree;
 
@@ -66,6 +66,7 @@ public class HomeController : Controller
         {
             domTree = new MappedDomTree();
         }
+        Console.WriteLine(model.ResultCount);
         var (selectedNode, timeSpan) = CSSSelector.QuerySelector(
             new DOMTree(domTree),
             model.CssSelector ?? "",
