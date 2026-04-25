@@ -78,10 +78,12 @@ public class HomeController : Controller
         List<int> traversedNodeIndex = new ();
         foreach (var node in selectedNode)
         {
+            if (node.Parent == null) continue;
             selectedNodeIndex.Add(node.NodeId);
         }
-        foreach (var node in selectedNode)
+        foreach (var node in traversedNode)
         {
+            if (node.Parent == null) continue;
             traversedNodeIndex.Add(node.NodeId);
         }
         return View(new CssSelectorViewModel
