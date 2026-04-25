@@ -70,8 +70,7 @@ public static class CSSSelector
                         traversalNodes.Add(desc);
                         if (MatchSelector(desc, nextSelector)) 
                         {
-                            if (isLastToken) maxSelected--;
-                            nextNodes.Add(desc);
+                            if (isLastToken && nextNodes.Add(desc)) maxSelected--;
                         }
                     }
                 }
@@ -83,19 +82,17 @@ public static class CSSSelector
                         traversalNodes.Add(child);
                         if (MatchSelector(child, nextSelector))
                         {
-                            if (isLastToken) maxSelected--;
-                            nextNodes.Add(child);
+                            if (isLastToken && nextNodes.Add(child)) maxSelected--;
                         } 
                     }
                 }
                 else if (combinator == "+") // Adjacent Sibling
                 {
                     var sibling = GetNextElementSibling(node);
+                    if (sibling != null) traversalNodes.Add(sibling);
                     if (sibling != null && MatchSelector(sibling, nextSelector))
                     {
-                        if (isLastToken) maxSelected--;
-                        traversalNodes.Add(sibling);
-                        nextNodes.Add(sibling);
+                        if (isLastToken && nextNodes.Add(sibling)) maxSelected--;
                     }
                 }
                 else if (combinator == "~") // General Sibling
@@ -107,8 +104,7 @@ public static class CSSSelector
                         traversalNodes.Add(sibling);
                         if (MatchSelector(sibling, nextSelector))
                         {
-                            if (isLastToken) maxSelected--;
-                            nextNodes.Add(sibling);
+                            if (isLastToken && nextNodes.Add(sibling)) maxSelected--;
                         } 
                     }
                 }
@@ -170,6 +166,7 @@ public static class CSSSelector
         string? tag = null;
         string? id = null;
         List<string> classes = new List<string>();
+        List<(string attr, string op, string val)> attributes = new List<(string, string, string)>();
 
         int i = 0;
         while (i < selector.Length)
@@ -177,25 +174,36 @@ public static class CSSSelector
             if (selector[i] == '#') // ID 
             {
                 int start = ++i;
-                while (i < selector.Length && selector[i] != '#' && selector[i] != '.') i++;
+                while (i < selector.Length && selector[i] != '#' && selector[i] != '.' && selector[i] != '[') i++;
                 id = selector.Substring(start, i - start);
             }
             else if (selector[i] == '.') // Class
             {
                 int start = ++i;
-                while (i < selector.Length && selector[i] != '#' && selector[i] != '.') i++;
+                while (i < selector.Length && selector[i] != '#' && selector[i] != '.' && selector[i] != '[') i++;
                 classes.Add(selector.Substring(start, i - start));
+            }
+            else if (selector[i] == '[') // Attribute
+            {
+                int start = ++i;
+                while (i < selector.Length && selector[i] != ']') i++; // Asumsi gaada closing bracket error
+                string attrContent = selector.Substring(start, i - start);
+
+                attributes.Add(ParseAttribute(attrContent));
+
+                if (i < selector.Length && selector[i] == ']') i++;
             }
             else // Tag
             {
                 int start = i;
-                while (i < selector.Length && selector[i] != '#' && selector[i] != '.') i++;
+                while (i < selector.Length && selector[i] != '#' && selector[i] != '.' && selector[i] != '[') i++;
                 tag = selector.Substring(start, i - start);
             }
         }
 
         // Bandingin tag selector dan tag node
         if (tag != null && tag != "*" && !string.Equals(node.Tag, tag, StringComparison.OrdinalIgnoreCase)) return false;
+        
         // Bandingin id selector dan id node
         if (id != null && !string.Equals(node.Id, id, StringComparison.OrdinalIgnoreCase)) return false;
 
@@ -205,30 +213,147 @@ public static class CSSSelector
             if (!node.Class.Contains(c)) return false;
         }
 
+        // Bandingin attribute node dan attribute selector
+        foreach (var a in attributes)
+        {
+            if (!node.Attribute.TryGetValue(a.attr, out var val)) 
+                return false;
+
+            if (a.op == "=" && !string.Equals(val, a.val, StringComparison.OrdinalIgnoreCase)) 
+                return false;
+
+            if (a.op == "~=") 
+            {
+                var words = val.Split(new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                if(!words.Contains(a.val, StringComparer.OrdinalIgnoreCase)) 
+                    return false;
+            }
+
+            if (a.op == "|=")
+            {
+                if(!string.Equals(val, a.val, StringComparison.OrdinalIgnoreCase) && !val.StartsWith(a.val + "-", StringComparison.OrdinalIgnoreCase))
+                    return false;
+            }
+
+            if (a.op == "^=" && !val.StartsWith(a.val, StringComparison.OrdinalIgnoreCase)) 
+                return false;
+
+            if (a.op == "$=" && !val.EndsWith(a.val, StringComparison.OrdinalIgnoreCase)) 
+                return false;
+
+            if (a.op == "*=" && !val.Contains(a.val, StringComparison.OrdinalIgnoreCase)) 
+                return false;
+        }
+
         return true;
+    }
+
+    private static (string, string, string) ParseAttribute(string contents)
+    {
+        (string, string, string) parsed = new ("", "", "");
+        int opIdx = contents.IndexOf("="); 
+        string op = "=";
+
+        if (opIdx == -1) parsed = (contents.Trim(), "", "");
+        else
+        {
+            string modifier = "~|^$*";
+            int attrEnd = opIdx - 1;
+            int valStart = opIdx + 1;
+
+            if(opIdx > 0 && modifier.Contains(contents[attrEnd]))
+            {
+                op = contents.Substring(attrEnd, 2);
+                attrEnd--;
+            } 
+
+            string attr = contents.Substring(0, attrEnd + 1).Trim();
+            string val  = contents.Substring(valStart).Trim();
+
+            if (val.Length >= 2 && ((val.StartsWith("\"") && val.EndsWith("\"")) || (val.StartsWith("'") && val.EndsWith("'"))))
+                val = val.Substring(1, val.Length - 2);
+
+            parsed = (attr, op, val);
+        }
+
+        return parsed;
     }
 
     private static List<string> TokenizeSelector(string selector)
     {
-        string spaced = Regex.Replace(selector, @"([>+~])", " $1 "); // change a~a to a ~ a
-        string[] parts = spaced.Split(new char[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries); // parse to a, ~, a
-        
         List<string> tokens = new List<string>();
-        for (int i = 0; i < parts.Length; i++)
+        bool insideBrackets = false;
+        bool insideQuotes = false;
+        char quoteChar = '\0';
+        
+        string currentToken = "";
+
+        for (int i = 0; i < selector.Length; i++)
         {
-            if (parts[i] == ">" || parts[i] == "+" || parts[i] == "~")
+            char c = selector[i];
+
+            if (insideQuotes)
             {
-                tokens.Add(parts[i]);
+                currentToken += c;
+                if (c == quoteChar) insideQuotes = false;
+            }
+            else if (insideBrackets)
+            {
+                currentToken += c;
+                if (c == '"' || c == '\'') 
+                {
+                    insideQuotes = true;
+                    quoteChar = c;
+                }
+                else if (c == ']') insideBrackets = false;
             }
             else
             {
-                if (tokens.Count > 0 && tokens.Last() != ">" && tokens.Last() != "+" && tokens.Last() != "~")
+                if (c == '"' || c == '\'')
                 {
-                    tokens.Add(" "); 
+                    insideQuotes = true;
+                    quoteChar = c;
+                    currentToken += c;
                 }
-                tokens.Add(parts[i]);
+                else if (c == '[')
+                {
+                    insideBrackets = true;
+                    currentToken += c;
+                }
+                else if (c == ' ' || c == '\t' || c == '\r' || c == '\n')
+                {
+                    if (!string.IsNullOrEmpty(currentToken))
+                    {
+                        tokens.Add(currentToken);
+                        currentToken = "";
+                    }
+                    if (tokens.Count > 0 && tokens.Last() != ">" && tokens.Last() != "+" 
+                        && tokens.Last() != "~" && tokens.Last() != " ")
+                    {
+                        tokens.Add(" ");
+                    }
+                }
+                else if (c == '>' || c == '+' || c == '~')
+                {
+                    if (!string.IsNullOrEmpty(currentToken))
+                    {
+                        tokens.Add(currentToken);
+                        currentToken = "";
+                    }
+                    
+                    if (tokens.Count > 0 && tokens.Last() == " ") 
+                        tokens.RemoveAt(tokens.Count - 1);
+                    
+                    tokens.Add(c.ToString());
+                }
+                else currentToken += c;
             }
         }
+
+        if (!string.IsNullOrEmpty(currentToken)) tokens.Add(currentToken);
+
+        while (tokens.Count > 0 && tokens.Last() == " ") tokens.RemoveAt(tokens.Count - 1);
+
         return tokens;
     }
 
