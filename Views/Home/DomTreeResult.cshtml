@@ -1,0 +1,43 @@
+@using DOMTreeTraversal.Models.View
+@model DomTreeViewModel
+@{
+    ViewData["Title"] = "DOM Tree Result";
+}
+
+<div class="text-center">
+    <h1 class="display-5">@ViewData["Title"]</h1>
+    <form method="POST" action="/Home/CssSelectorResult" enctype="multipart/form-data">
+        <input type="text" id="CssSelector" name="CssSelector" placeholder="Insert CSS Selector"
+               class="my-2 text-md-start w-50 rounded-4 border-3 py-2 px-3" />
+        <div class="d-flex gap-2 justify-content-center mb-2">
+            <label for="TraversalType" class="my-auto">Traversal Type</label>
+            <select id="TraversalType" name="TraversalType" class="h-75 my-auto">
+                <option value="bfs">BFS</option>
+                <option value="dfs">DFS</option>
+            </select>
+            <div></div>
+            <label for="ResultCount" class="my-auto">Result Count</label>
+            <input id="ResultCount" name="ResultCount" type="number" min="1" value="5" class="h-75 my-auto"
+                   style="width: 3rem;" />
+            <button type="submit"
+                    class="my-2 py-1 px-3 bg-primary border-3 border-success-subtle rounded-3 text-white">Search</button>
+        </div>
+        <textarea type="text" id="DomTreeJson" name="DomTreeJson" hidden>@Html.Raw(Model.DomTreeJson)</textarea>
+    </form>
+    <h4 id="maxLevel">Kedalaman Maksimal: </h4>
+    <div id="result-tree" class="overflow-x-scroll border border-2">
+
+    </div>
+</div>
+
+<script>
+    var rawJson = '@Html.Raw(Model.DomTreeJson)';
+    var safeJson;
+    var htmlTree;
+    window.addEventListener('load', function () {
+        var safeJson = SanitizeJsonString(rawJson);
+        var htmlTree = JSON.parse(safeJson);
+        document.getElementById("maxLevel").textContent = "Kedalaman Maksimal: " + htmlTree.MaxLevel;
+        build(document.getElementById("result-tree"), htmlTree);
+    });
+</script>

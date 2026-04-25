@@ -29,3 +29,64 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+.node {
+  margin-left: auto;
+  margin-right: auto;
+  padding: 5px;
+  border: double;
+  border-width: 2;
+  border-color: black;
+  min-width: 125px;
+  width: fit-content;
+  box-shadow: 6px 6px 3px gray;
+}
+
+.node.traversed {
+  background-color: gold;
+}
+
+.node.selected {
+  background-color: limegreen;
+  border: solid 4px;
+}
+
+.vertical-edge {
+  border-left: solid 2px;
+  min-height: 20px;
+  width: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.top-to-left-edge {
+  border-top: solid 2px;
+  border-right: solid 1px;
+  border-left: none;
+  border-bottom: none;
+  min-height: 20px;
+}
+
+.top-to-right-edge {
+  border-top: solid 2px;
+  border-right: none;
+  border-left: solid 1px;
+  border-bottom: none;
+  min-height: 20px;
+}
+
+.only-top-to-left-edge {
+  border-top: solid 2px;
+  border-right: solid 2px;
+  border-left: none;
+  border-bottom: none;
+  min-height: 20px;
+}
+
+.only-top-to-right-edge {
+  border-top: solid 2px;
+  border-right: none;
+  border-left: solid 2px;
+  border-bottom: none;
+  min-height: 20px;
+}

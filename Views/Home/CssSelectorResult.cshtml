@@ -1,0 +1,95 @@
+@using DOMTreeTraversal.Models.View
+@model CssSelectorViewModel
+@{
+    ViewData["Title"] = "CSS Selector Result";
+}
+
+<div class="text-center">
+    <h1 class="display-5">@ViewData["Title"]</h1>
+    <form method="POST" action="/Home/CssSelectorResult" enctype="multipart/form-data">
+        <input type="text" id="CssSelector" name="CssSelector" placeholder="Insert CSS Selector"
+               class="my-2 text-md-start w-50 rounded-4 border-3 py-2 px-3" value="@Model.CssSelector" />
+        <div class="d-flex gap-2 justify-content-center my-2">
+            <label for="TraversalType" class="my-auto">Traversal Type: </label>
+            <select id="TraversalType" name="TraversalType" class="h-75 my-auto" value="@Html.Raw(Model.TraversalType)">
+                <option value="bfs">BFS</option>
+                <option value="dfs">DFS</option>
+            </select>
+            <div></div>
+            <label for="ResultCount" class="my-auto">Max Result: </label>
+            <input id="ResultCount" name="ResultCount" type="number" min="1" value="@Model.ResultCount"
+                   class="h-75 my-auto" style="width: 6rem;" />
+            <button type="submit"
+                    class="my-2 py-1 px-3 bg-primary border-3 border-success-subtle rounded-3 text-white">Search</button>
+        </div>
+        <input type="text" id="domTreeJson" name="domTreeJson" value='@Html.Raw(Model.DomTreeJson)' hidden />
+    </form>
+    <h4 id="nodeCount">Banyak Hasil: @Html.Raw(@Model.TimeSpanSecond) detik</h4>
+    <h4 id="timeExecution">Waktu Eksekusi: @Html.Raw(@Model.TimeSpanSecond) detik</h4>
+    <div class="d-flex gap-2 justify-content-center">
+        <button id="startAnimation" class="bg-primary text-white" onclick="startAnimation()">Restart Animation</button>
+        <button id="skipAnimation" class="bg-primary text-white" onclick="stopAnimation()">Skip Animation</button>
+    </div>
+    <h4 id="maxLevel">Kedalaman Maksimal: </h4>
+    <div id="result-tree" class="overflow-x-scroll border border-2">
+    </div>
+</div>
+
+<script>
+    var rawJson = '@Html.Raw(Model.DomTreeJson)';
+    var safeJson;
+    var htmlTree;
+    var traversalOrder;
+    var selectedNode;
+    let infoMap = new Map();
+
+    let index = 0;
+    let loop;
+    function nextStep(infoMap = new Map(), selectedNode = [], traversalOrder = [], isSelecting = false) {
+        if (isSelecting) {
+            infoMap[traversalOrder[index]].classList.add("selected");
+        }
+        else {
+            infoMap[traversalOrder[index]].classList.add("traversed");
+        }
+        if (!isSelecting && selectedNode.findIndex((v) => v == traversalOrder[index]) != -1) {
+            loop = setTimeout(() => nextStep(infoMap, selectedNode, traversalOrder, true), 100)
+        }
+        else {
+            index++;
+            if (index < traversalOrder.length) {
+                loop = setTimeout(() => nextStep(infoMap, selectedNode, traversalOrder), 100)
+            }
+        }
+    }
+
+    function startAnimation() {
+        clearTimeout(loop);
+        for (var i in infoMap) {
+            if (Object.prototype.hasOwnProperty.call(infoMap, i)) {
+                infoMap[i].classList.remove("traversed", "selected");
+            }
+        }
+        index = 0;
+        loop = setTimeout(nextStep(infoMap, selectedNode, traversalOrder), 100);
+    }
+    function stopAnimation() {
+        clearTimeout(loop);
+        for (let i = 0; i < traversalOrder.length; i++) {
+            infoMap[traversalOrder[i]].classList.add("traversed");
+        }
+        for (let i = 0; i < selectedNode.length; i++) {
+            infoMap[selectedNode[i]].classList.add("selected");
+        }
+    }
+    window.addEventListener('load', function () {
+        safeJson = SanitizeJsonString(rawJson);
+        htmlTree = JSON.parse(safeJson);
+        traversalOrder = JSON.parse('@Html.Raw(Model.TraversalJson)');
+        selectedNode = JSON.parse('@Html.Raw(Model.SelectedJson)');
+        document.getElementById("maxLevel").textContent = "Kedalaman Maksimal: " + htmlTree.MaxLevel;
+        document.getElementById("nodeCount").textContent = "Banyak Hasil: " + selectedNode.length;
+        build(document.getElementById("result-tree"), htmlTree, infoMap);
+        startAnimation();
+    });
+</script>

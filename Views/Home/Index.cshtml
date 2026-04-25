@@ -1,8 +1,83 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Search DOM Element with CSS Selector";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-5">@ViewData["Title"]</h1>
+    <form method="POST" action="/Home/DomTreeResult" enctype="multipart/form-data">
+        <div class="d-flex mx-auto bg-white border-primary border border-3 rounded-4 justify-content-center overflow-hidden mt-4"
+             style="width: fit-content;">
+            <input type="text" id="InputType" name="InputType" value="link" class="d-none"/>
+            <button type="button" id="inputWithLink" onclick="switchToLink()" class="py-1 px-2 bg-primary text-white border-0">Input with link</button>
+            <div class="border border-1 border-primary-subtle" style="width: 1px;"></div>
+            <button type="button" id="inputWithFile" onclick="switchToFile()" class="py-1 px-2 bg-white text-black border-0">Input with file</button>
+            <div class="border border-1 border-primary-subtle" style="width: 1px;"></div>
+            <button type="button" id="inputWithText" onclick="switchToText()" class="py-1 px-2 bg-white text-black border-0">Input with text</button>
+        </div>
+        <div class="my-2">
+            <div id="linkInput">
+                <input type="text" id="HtmlLink" name="HtmlLink" placeholder="Insert web page link"
+                       class="text-lg-start w-75 rounded-4 border-3 py-2 px-3" />
+            </div>
+            <div id="fileInput" class="d-none">
+                <label
+                    class="d-flex justify-content-center mx-auto my-2 text-lg-start w-75 rounded-4 border border-black border-3 py-2 px-3"
+                        onmouseenter="this.classList.add('bg-primary-subtle')"
+                        onmouseleave="this.classList.remove('bg-primary-subtle')">
+                    <input type="file" id="HtmlFile" name="HtmlFile" accept=".html, .txt" class="d-none"
+                           onchange="document.getElementById('fileName').innerText = 'Uploaded file: ' + this.value.split('\\').pop()" />
+                    <p id="fileName" class="my-auto text-black-50">Upload file (.txt, .html)</p>
+                </label>
+            </div>
+            <div id="textInput" class="d-none">
+                <textarea type="text" id="HtmlText" name="HtmlText" placeholder="Insert html text" rows="12"
+                          class="mx-auto py-2 px-3 text-lg-start w-75 rounded-3 border-3 h-50"></textarea>
+            </div>
+        </div>
+        <button type="submit" class="my-2 py-1 px-3 bg-success border-3 border-success-subtle rounded-3 text-white">Parse HTML into Tree</button>
+    </form>
+    <script>
+        function switchToLink() {
+            document.getElementById('inputWithLink').classList.remove('bg-white', 'text-black');
+            document.getElementById('inputWithLink').classList.add('bg-primary', 'text-white');
+            document.getElementById('inputWithFile').classList.remove('bg-primary', 'text-white');
+            document.getElementById('inputWithFile').classList.add('bg-white', 'text-black');
+            document.getElementById('inputWithText').classList.remove('bg-primary', 'text-white');
+            document.getElementById('inputWithText').classList.add('bg-white', 'text-black');
+            document.getElementById('linkInput').classList.remove('d-none');
+            document.getElementById('fileInput').classList.add('d-none');
+            document.getElementById('textInput').classList.add('d-none');
+            document.getElementById('InputType').value = 'link';
+        }
+        function switchToFile() {
+            document.getElementById('inputWithLink').classList.remove('bg-primary', 'text-white');
+            document.getElementById('inputWithLink').classList.add('bg-white', 'text-black');
+            document.getElementById('inputWithFile').classList.remove('bg-white', 'text-black');
+            document.getElementById('inputWithFile').classList.add('bg-primary', 'text-white');
+            document.getElementById('inputWithText').classList.remove('bg-primary', 'text-white');
+            document.getElementById('inputWithText').classList.add('bg-white', 'text-black');
+            document.getElementById('linkInput').classList.add('d-none');
+            document.getElementById('fileInput').classList.remove('d-none');
+            document.getElementById('textInput').classList.add('d-none');
+            document.getElementById('InputType').value = 'file';
+        }
+        function switchToText() {
+            document.getElementById('inputWithLink').classList.remove('bg-primary', 'text-white');
+            document.getElementById('inputWithLink').classList.add('bg-white', 'text-black');
+            document.getElementById('inputWithFile').classList.remove('bg-primary', 'text-white');
+            document.getElementById('inputWithFile').classList.add('bg-white', 'text-black');
+            document.getElementById('inputWithText').classList.remove('bg-white', 'text-black');
+            document.getElementById('inputWithText').classList.add('bg-primary', 'text-white');
+            document.getElementById('linkInput').classList.add('d-none');
+            document.getElementById('fileInput').classList.add('d-none');
+            document.getElementById('textInput').classList.remove('d-none');
+            document.getElementById('InputType').value = 'text';
+        }
+
+        let inputType = document.getElementById("InputType").value;
+        if (inputType == "link") switchToLink();
+        else if (inputType == "file") switchToFile();
+        else if (inputType == "text") switchToText();
+
+    </script>
 </div>
