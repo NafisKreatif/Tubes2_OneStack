@@ -56,7 +56,6 @@ public class HomeController : Controller
     [HttpPost]
     public IActionResult CssSelectorResult([Bind("DomTreeJson", "CssSelector", "TraversalType", "ResultCount")] CssSelectorInputModel model)
     {
-        Console.WriteLine(model.CssSelector);
         MappedDomTree domTree;
 
         if (model.DomTreeJson != null)
