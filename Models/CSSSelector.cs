@@ -14,23 +14,22 @@ public enum TraversalMethod
 
 public static class CSSSelector
 {
-    public static (List<DOMNode>, List<DOMNode>, TimeSpan) QuerySelector(DOMTree tree, string selector, int maxSelected, TraversalMethod method = TraversalMethod.DFS)
+    public static List<DOMNode> traversalNodes = new List<DOMNode>();
+    public static (List<DOMNode>, TimeSpan) QuerySelector(DOMTree tree, string selector, int maxSelected, TraversalMethod method = TraversalMethod.DFS)
     {
         return QuerySelector(tree.Root, selector, maxSelected, method);
     }
-    public static (List<DOMNode>, List<DOMNode>, TimeSpan) QuerySelector(DOMNode root, string selector, int maxSelected, TraversalMethod method = TraversalMethod.DFS)
+    public static (List<DOMNode>, TimeSpan) QuerySelector(DOMNode root, string selector, int maxSelected, TraversalMethod method = TraversalMethod.DFS)
     {
-        if (string.IsNullOrWhiteSpace(selector)) return (new List<DOMNode>(), new List<DOMNode>(), new TimeSpan()); 
+        if (string.IsNullOrWhiteSpace(selector)) return (new List<DOMNode>(), new TimeSpan()); 
 
         var tokens = TokenizeSelector(selector);
-        if (tokens.Count == 0) return (new List<DOMNode>(), new List<DOMNode>(), new TimeSpan());
+        if (tokens.Count == 0) return (new List<DOMNode>(), new TimeSpan());
         
         DateTime startTime = DateTime.Now;
 
         var currNodes = GetNodes(root, method, n => MatchSelector(n, tokens[0]));
         
-        List<DOMNode> traversalNodes = new List<DOMNode>();
-
         // Filterrrrrrrrr
         int lastToken = tokens.Count - 2;
 
@@ -108,7 +107,7 @@ public static class CSSSelector
         DateTime endTime = DateTime.Now;
         TimeSpan runTime = endTime - startTime;
 
-        return (currNodes, traversalNodes, runTime);
+        return (currNodes, runTime);
     }
 
     private static List<DOMNode> GetNodes(DOMNode startNode, TraversalMethod method, Func<DOMNode, bool> condition)
@@ -127,6 +126,7 @@ public static class CSSSelector
 
     private static void TraverseDFS(DOMNode node, List<DOMNode> result, Func<DOMNode, bool> condition)
     {
+        traversalNodes.Add(node);
         if (condition(node)) result.Add(node);
         foreach (var child in node.Children) TraverseDFS(child, result, condition);
     }
@@ -140,6 +140,7 @@ public static class CSSSelector
         while (queue.Count > 0)
         {
             var current = queue.Dequeue();
+            traversalNodes.Add(current);
             if (condition(current)) result.Add(current);
 
             foreach (var child in current.Children) queue.Enqueue(child);
@@ -246,6 +247,7 @@ public static class CSSSelector
         {
             for (int i = index + 1; i < siblings.Count; i++)
             {
+                traversalNodes.Add(siblings[i]);
                 if (!siblings[i].IsTextNode()) result.Add(siblings[i]);
             }
         }
