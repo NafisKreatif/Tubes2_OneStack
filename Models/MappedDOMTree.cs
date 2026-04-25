@@ -1,6 +1,6 @@
-using DOMTreeTraversal.Models;
+namespace DOMTreeTraversal.Models;
 
-class MappedDomTree
+public class MappedDomTree
 {
     public int RootId { get; set; }
     public int MaxLevel { get; set; }
@@ -26,10 +26,10 @@ class MappedDomTree
             {
                 Index = node.NodeId,
                 Tag = node.Tag,
-                Text = "",
+                Text = node.Text,
                 Id = node.Id,
                 Class = [.. node.Class],
-                Attribute = [],
+                Attribute = node.Attribute,
                 Children = []
             };
             if (node.Parent != null)
@@ -55,7 +55,7 @@ class MappedDomTree
     }
 }
 
-class MappedDomNode
+public class MappedDomNode
 {
     public int Index { get; set; }
     public string Tag { get; set; }

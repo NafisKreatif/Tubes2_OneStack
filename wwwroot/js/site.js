@@ -48,7 +48,7 @@ function build(element = document.createElement("div"), htmlTree, infoMap = new 
                     edgeDiv.appendChild(topLeftEdge);
                     edgeDiv.appendChild(topRightEdge);
                 }
-                else if (i > 0) {
+                else if (i == 0) {
                     let topLeftEdge = document.createElement("div");
                     let topRightEdge = document.createElement("div");
                     topRightEdge.classList.add("only-top-to-right-edge");

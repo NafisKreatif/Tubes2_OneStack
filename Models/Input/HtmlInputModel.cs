@@ -1,4 +1,4 @@
-namespace DOMTreeTraversal.Models;
+namespace DOMTreeTraversal.Models.Input;
 
 public class HtmlInputModel
 {
