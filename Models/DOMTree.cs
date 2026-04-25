@@ -18,7 +18,7 @@ public class DOMNode(string tag = "", string text = "")
     public string Id { get; set; } = "";
     //untuk class di css selector
     public List<string> Class { get; set; } = new List<string>();
-    public Dictionary<string, string> Attribute { get; set; } = new Dictionary<string, string>();
+    public Dictionary<string, string> Attribute { get; set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
     public List<DOMNode> Children { get; set; } = new List<DOMNode>();
     public DOMNode? Parent { get; set; }
 
